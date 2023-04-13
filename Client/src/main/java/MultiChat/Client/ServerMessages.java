@@ -29,6 +29,7 @@ public class ServerMessages implements Runnable {
             }
             catch (IOException e){
                 try {
+                    in.close();
                     socket.close();
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);

@@ -11,6 +11,8 @@ public class Main {
     static Scanner scanner;
     static ServerMessages server;
 
+    static PrintStream out;
+
     public static void main(String[] args) {
 
         scanner = new Scanner(System.in);
@@ -19,11 +21,10 @@ public class Main {
 
         try {
             Socket socket = new Socket("localhost", ServerMessages.PORT);
-            PrintStream out = new PrintStream(socket.getOutputStream());
+            out = new PrintStream(socket.getOutputStream());
             server = new ServerMessages(socket);
             Thread r = new Thread(server);
             r.start();
-
 
             out.println(userName);
             out.flush();
@@ -35,8 +36,10 @@ public class Main {
             }
 
         } catch (UnknownHostException e) {
+            out.close();
             throw new RuntimeException(e);
         } catch (IOException e) {
+            out.close();
             throw new RuntimeException(e);
         }
     }
