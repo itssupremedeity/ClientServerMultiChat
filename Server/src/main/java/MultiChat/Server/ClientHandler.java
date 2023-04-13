@@ -8,7 +8,6 @@ public class ClientHandler {
 
     private Socket socket;
     private String clientName;
-
     private final PrintStream out;
 
 
@@ -29,5 +28,10 @@ public class ClientHandler {
     public void sendMsg(String msg){
         out.println(msg);
         out.flush();
+    }
+
+    public void closeOutput() throws IOException {
+        out.close();
+        socket.close();
     }
 }

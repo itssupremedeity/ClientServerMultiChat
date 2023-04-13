@@ -3,7 +3,6 @@ package MultiChat.Server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -33,11 +32,20 @@ public class Server implements Runnable{
         String msgFromClient;
 
         while (clientHandler.getSocket().isConnected()){
+
             try {
                 msgFromClient = in.readLine();
+                if(msgFromClient == null){
+                    clients.remove(this);
+                    serverBroadcast("SERVER: " + clientName + " left chat...");
+                    closeEverything();
+                    break;
+                }
                 serverBroadcast(clientHandler.getClientName() + ": " + msgFromClient);
             }
             catch (IOException e){
+                clients.remove(this);
+                serverBroadcast("SERVER: " + clientName + " left chat...");
                 closeEverything();
             }
         }
@@ -54,7 +62,7 @@ public class Server implements Runnable{
     private void closeEverything(){
         try {
             in.close();
-            clientHandler.getSocket().close();
+            clientHandler.closeOutput();
         }catch (IOException e){
             e.printStackTrace();
         }
