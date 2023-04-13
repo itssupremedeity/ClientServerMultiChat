@@ -18,17 +18,49 @@ public class Server implements Runnable{
     public Server(Socket socket) throws IOException {
         String clientMachine = socket.getInetAddress().getHostName();
         System.out.println("Connection from " + clientMachine);
-        this.clientHandler = new ClientHandler(socket);
         out = new PrintStream(socket.getOutputStream());
         in = new BufferedReader(new InputStreamReader(
                 socket.getInputStream()));
-        System.out.println("Waiting for client...");
+        String clientName = in.readLine();
+        this.clientHandler = new ClientHandler(socket,clientName);
         clients.add(this);
     }
-
 
     @Override
     public void run() {
 
+        serverBroadcast("SERVER: " + clientHandler.getClientName() + " Has Entered The Chat...");
+
+        String msgFromClient;
+
+        while (clientHandler.getSocket().isConnected()){
+            try {
+                msgFromClient = in.readLine();
+                serverBroadcast(clientHandler.getClientName() + ": " + msgFromClient);
+            }
+            catch (IOException e){
+                closeEverything();
+            }
+        }
+    }
+
+    private void serverBroadcast(String msg){
+
+        for(Server client : clients) {
+            if(!client.clientHandler.getClientName().equals(this.clientHandler.getClientName())){
+                out.println(msg);
+                out.flush();
+            }
+        }
+    }
+
+    private void closeEverything(){
+        try {
+            in.close();
+            out.close();
+            clientHandler.getSocket().close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 }
