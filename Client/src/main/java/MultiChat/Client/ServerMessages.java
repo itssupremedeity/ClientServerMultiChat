@@ -25,7 +25,7 @@ public class ServerMessages implements Runnable {
         while (socket.isConnected()){
             try {
                 msgFromServer = in.readLine();
-                System.out.printf(msgFromServer);
+                System.out.println(msgFromServer);
             }
             catch (IOException e){
                 try {
